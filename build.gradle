@@ -3,6 +3,10 @@ plugins {
     id 'java'
 }
 
+war {
+    archiveFileName = 'servletframework.war'
+}
+
 group 'org.example'
 version '1.0-SNAPSHOT'
 
@@ -12,9 +16,12 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.11'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:5.0.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
+    implementation 'org.reflections:reflections:0.10.2'
+    implementation 'org.apache.commons:commons-dbcp2:2.9.0'
 }
 
 test {
