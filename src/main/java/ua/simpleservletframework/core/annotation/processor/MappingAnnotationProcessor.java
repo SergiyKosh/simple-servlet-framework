@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import ua.simpleservletframework.core.annotation.annotation.controller.Controller;
 import ua.simpleservletframework.core.annotation.annotation.controller.RestController;
 import ua.simpleservletframework.core.annotation.annotation.mapping.*;
+import ua.simpleservletframework.core.servlet.DispatcherServlet;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -194,6 +195,9 @@ public class MappingAnnotationProcessor {
         try {
             Object result = mapping.invoke(controller.getConstructor().newInstance());
 
+            request = DispatcherServlet.request;
+            response = DispatcherServlet.response;
+
             if (controller.isAnnotationPresent(RestController.class)) {
                 response.setContentType("application/json; UTF-8");
                 ObjectMapper mapper = new ObjectMapper();
@@ -224,10 +228,17 @@ public class MappingAnnotationProcessor {
             HttpServletResponse response
     ) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
         Object result = mapping.invoke(controller.getConstructor().newInstance());
+        result = result.toString()
+                .replaceAll("redirect:", "")
+                .replaceAll(".jsp", "")
+                .replaceAll(".html", "");
         response.sendRedirect(result.toString());
     }
 
     public void mappingHandler(Set<Class<?>> controllers, HttpServletRequest request, HttpServletResponse response) throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        DispatcherServlet.request = request;
+        DispatcherServlet.response = response;
+
         Set<Class<?>> requiredControllers = getRequiredControllers(controllers, request);
         if (requiredControllers.isEmpty()) {
             response.getWriter().write("This mapping type does not supported on url " + request.getRequestURI());

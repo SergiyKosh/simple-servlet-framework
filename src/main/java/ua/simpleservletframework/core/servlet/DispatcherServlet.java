@@ -1,4 +1,4 @@
-package ua.simpleservletframework.core;
+package ua.simpleservletframework.core.servlet;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,6 +13,9 @@ import java.util.Set;
 
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
+    public static HttpServletRequest request;
+    public static HttpServletResponse response;
+
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Set<Class<?>> controllers = new ControllerAnnotationProcessor().getAllControllerClasses();
