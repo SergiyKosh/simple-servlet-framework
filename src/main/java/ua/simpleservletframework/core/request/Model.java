@@ -1,6 +1,5 @@
 package ua.simpleservletframework.core.request;
 
-import jakarta.servlet.http.HttpServletRequest;
 import ua.simpleservletframework.core.servlet.DispatcherServlet;
 
 import javax.annotation.Nullable;

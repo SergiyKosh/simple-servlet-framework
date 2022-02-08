@@ -7,6 +7,7 @@ This project is being developed by me for improve my knowledge in Reflection and
 - Apache Tomcat as Servlet container
 - Reflections for class search
 - Lombok to avoid boilerplate code
+- Jackson for JSON mapping
 ## Now implemented
 1. Dispatcher servlet that handles all http-requests and directs them to controllers;
 2. Servlet filter to avoid blocking requests by CORS policy;
