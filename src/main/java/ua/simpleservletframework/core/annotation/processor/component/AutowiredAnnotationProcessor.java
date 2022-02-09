@@ -3,12 +3,11 @@ package ua.simpleservletframework.core.annotation.processor.component;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import ua.simpleservletframework.core.annotation.annotation.component.Autowired;
-import ua.simpleservletframework.core.annotation.annotation.controller.RestController;
+import ua.simpleservletframework.mvc.annotation.annotation.controller.RestController;
 import ua.simpleservletframework.core.beans.BeanImplementation;
 import ua.simpleservletframework.core.context.Context;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;

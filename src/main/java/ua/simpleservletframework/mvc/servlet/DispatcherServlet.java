@@ -1,11 +1,12 @@
-package ua.simpleservletframework.core.servlet;
+package ua.simpleservletframework.mvc.servlet;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ua.simpleservletframework.core.annotation.processor.controller.ControllerAnnotationProcessor;
-import ua.simpleservletframework.core.annotation.processor.mapping.MappingAnnotationProcessor;
+import ua.simpleservletframework.mvc.annotation.processor.controller.ControllerAnnotationProcessor;
+import ua.simpleservletframework.mvc.annotation.processor.mapping.MappingAnnotationProcessor;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -21,7 +22,7 @@ public class DispatcherServlet extends HttpServlet {
         Set<Class<?>> controllers = new ControllerAnnotationProcessor().getAllControllerClasses();
         try {
             new MappingAnnotationProcessor().mappingHandler(controllers, request, response);
-        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
+        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException | ServletException e) {
             throw new RuntimeException(e);
         }
     }

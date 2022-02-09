@@ -3,8 +3,8 @@ package ua.simpleservletframework.core.annotation.processor.component;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import ua.simpleservletframework.core.annotation.annotation.component.Component;
-import ua.simpleservletframework.core.annotation.annotation.controller.Controller;
-import ua.simpleservletframework.core.annotation.annotation.controller.RestController;
+import ua.simpleservletframework.mvc.annotation.annotation.controller.Controller;
+import ua.simpleservletframework.mvc.annotation.annotation.controller.RestController;
 import ua.simpleservletframework.core.beans.BeanImplementation;
 
 import java.lang.reflect.InvocationTargetException;

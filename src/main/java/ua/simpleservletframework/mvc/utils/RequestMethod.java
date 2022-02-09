@@ -1,4 +1,4 @@
-package ua.simpleservletframework.core.util;
+package ua.simpleservletframework.mvc.utils;
 
 public final class RequestMethod {
     public static final String GET = "GET";
