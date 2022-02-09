@@ -18,7 +18,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static ua.simpleservletframework.core.util.Constants.MULTIPLE_CONTROLLER_TYPE_EXCEPTION;
+import static ua.simpleservletframework.core.servlet.DispatcherServlet.response;
+import static ua.simpleservletframework.core.util.Constants.*;
 import static ua.simpleservletframework.core.util.RequestMethod.*;
 import static ua.simpleservletframework.core.util.Utils.requestUri;
 
@@ -59,7 +60,7 @@ public class MappingAnnotationProcessor {
                                             requestUri(c.getAnnotation(Controller.class).value(), rm.getAnnotation(OptionsMapping.class).value())
                                                     .equals(requestUri));
                         } else {
-                            throw new RuntimeException("Unknown request type");
+                            throw new RuntimeException(UNKNOWN_REQUEST_TYPE);
                         }
                     } else if (c.isAnnotationPresent(RestController.class)) {
                         if (request.getMethod().equals(GET)) {
@@ -93,7 +94,7 @@ public class MappingAnnotationProcessor {
                                             requestUri(c.getAnnotation(RestController.class).value(), rm.getAnnotation(OptionsMapping.class).value())
                                                     .equals(requestUri));
                         } else {
-                            throw new RuntimeException("Unknown request type");
+                            throw new RuntimeException(UNKNOWN_REQUEST_TYPE);
                         }
                     } else {
                         throw new RuntimeException(MULTIPLE_CONTROLLER_TYPE_EXCEPTION);
@@ -241,7 +242,7 @@ public class MappingAnnotationProcessor {
 
         Set<Class<?>> requiredControllers = getRequiredControllers(controllers, request);
         if (requiredControllers.isEmpty()) {
-            response.getWriter().write("This mapping type does not supported on url " + request.getRequestURI());
+            response.getWriter().write(REQUEST_TYPE_NOT_SUPPORTED_ON_THIS_URL + request.getRequestURI());
         } else {
             Map.Entry<? extends Class<?>, Method> mappingMethod = getRequiredMethod(requiredControllers, request);
             Class<?> controller = mappingMethod.getKey();
