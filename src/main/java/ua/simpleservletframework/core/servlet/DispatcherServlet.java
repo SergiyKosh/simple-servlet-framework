@@ -1,13 +1,11 @@
 package ua.simpleservletframework.core.servlet;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ua.simpleservletframework.core.annotation.processor.BeanAnnotationProcessor;
-import ua.simpleservletframework.core.annotation.processor.ControllerAnnotationProcessor;
-import ua.simpleservletframework.core.annotation.processor.MappingAnnotationProcessor;
+import ua.simpleservletframework.core.annotation.processor.controller.ControllerAnnotationProcessor;
+import ua.simpleservletframework.core.annotation.processor.mapping.MappingAnnotationProcessor;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -15,8 +13,8 @@ import java.util.Set;
 
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
-    public static HttpServletRequest request;
-    public static HttpServletResponse response;
+    public static volatile HttpServletRequest request;
+    public static volatile HttpServletResponse response;
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -28,3 +26,5 @@ public class DispatcherServlet extends HttpServlet {
         }
     }
 }
+
+

@@ -1,4 +1,4 @@
-package ua.simpleservletframework.core.annotation.processor;
+package ua.simpleservletframework.core.annotation.processor.mapping;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import ua.simpleservletframework.core.annotation.annotation.controller.Controller;
 import ua.simpleservletframework.core.annotation.annotation.controller.RestController;
 import ua.simpleservletframework.core.annotation.annotation.mapping.*;
+import ua.simpleservletframework.core.context.Context;
 import ua.simpleservletframework.core.servlet.DispatcherServlet;
 
 import java.io.IOException;
@@ -18,12 +19,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static ua.simpleservletframework.core.servlet.DispatcherServlet.response;
 import static ua.simpleservletframework.core.util.Constants.*;
 import static ua.simpleservletframework.core.util.RequestMethod.*;
 import static ua.simpleservletframework.core.util.Utils.requestUri;
 
 public class MappingAnnotationProcessor {
+    private final Context<?> context = new Context<>();
+
     private Set<Class<?>> getRequiredControllers(Set<Class<?>> controllers, HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         return controllers.stream()
@@ -189,15 +191,13 @@ public class MappingAnnotationProcessor {
 
     private void getMappingHandler(
             Class<?> controller,
-            Method mapping,
-            HttpServletRequest request,
-            HttpServletResponse response
+            Method mapping
     ) {
         try {
-            Object result = mapping.invoke(controller.getConstructor().newInstance());
+            Object result = mapping.invoke(context.getBean(controller).getValue());
 
-            request = DispatcherServlet.request;
-            response = DispatcherServlet.response;
+            HttpServletRequest request = DispatcherServlet.request;
+            HttpServletResponse response = DispatcherServlet.response;
 
             if (controller.isAnnotationPresent(RestController.class)) {
                 response.setContentType("application/json; UTF-8");
@@ -218,7 +218,7 @@ public class MappingAnnotationProcessor {
                 request.getRequestDispatcher(result.toString()).forward(request, response);
             }
         } catch (IllegalAccessException | InvocationTargetException | ServletException
-                | IOException | NoSuchMethodException | InstantiationException e) {
+                | IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -227,8 +227,8 @@ public class MappingAnnotationProcessor {
             Class<?> controller,
             Method mapping,
             HttpServletResponse response
-    ) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
-        Object result = mapping.invoke(controller.getConstructor().newInstance());
+    ) throws InvocationTargetException, IllegalAccessException, IOException {
+        Object result = mapping.invoke(context.getBean(controller).getValue());
         result = result.toString()
                 .replaceAll("redirect:", "")
                 .replaceAll(".jsp", "")
@@ -248,7 +248,7 @@ public class MappingAnnotationProcessor {
             Class<?> controller = mappingMethod.getKey();
             Method mapping = mappingMethod.getValue();
             if (mapping.isAnnotationPresent(GetMapping.class)) {
-                getMappingHandler(controller, mapping, request, response);
+                getMappingHandler(controller, mapping);
             } else if (
                     mapping.isAnnotationPresent(PutMapping.class)
                             || mapping.isAnnotationPresent(PostMapping.class)

@@ -1,4 +1,4 @@
-package ua.simpleservletframework.core.annotation.processor;
+package ua.simpleservletframework.core.annotation.processor.controller;
 
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
