@@ -13,5 +13,6 @@ This project is being developed by me for improve my knowledge in Reflection and
 2. Servlet filter to avoid blocking requests by CORS policy;
 3. @Controller and @RestController annotations. Difference between them in the data mapping. @Controller mapps data as jsp page, @RestController - as JSON;
 4. @GetMapping, @PutMapping, @PostMapping, @DeleteMapping and @OptionsMapping annotations for handling http-requests.
+5. @Bean for instantiate objects before application initialization.
 ## Projects which will be written using this framework
 Link to a project that will be demonstrate framework features will be here :)
