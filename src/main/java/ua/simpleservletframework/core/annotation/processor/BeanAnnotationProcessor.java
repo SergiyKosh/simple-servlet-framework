@@ -3,7 +3,7 @@ package ua.simpleservletframework.core.annotation.processor;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import ua.simpleservletframework.core.annotation.annotation.component.Bean;
-import ua.simpleservletframework.core.beans.impl.BeanImplementation;
+import ua.simpleservletframework.core.beans.BeanImplementation;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;

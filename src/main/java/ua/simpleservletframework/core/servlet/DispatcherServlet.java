@@ -15,13 +15,6 @@ import java.util.Set;
 
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
-    @Override
-    public void init() throws ServletException {
-        BeanAnnotationProcessor beanAnnotationProcessor = new BeanAnnotationProcessor();
-        Set<Class<?>> beans = beanAnnotationProcessor.getAllBeanClasses();
-        beanAnnotationProcessor.initAllBeans(beans);
-    }
-
     public static HttpServletRequest request;
     public static HttpServletResponse response;
 
