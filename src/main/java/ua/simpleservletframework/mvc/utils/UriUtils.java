@@ -1,7 +1,7 @@
-package ua.simpleservletframework.core.util;
+package ua.simpleservletframework.mvc.utils;
 
-public class Utils {
-    public static String requestUri(String cUri, String rmUri) {
+public class UriUtils {
+    public static String formatRequestUri(String cUri, String rmUri) {
         if (cUri.equals("/") && !rmUri.equals("/")) {
             cUri = "";
         } else if (rmUri.equals("/")) {

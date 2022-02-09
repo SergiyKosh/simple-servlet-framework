@@ -1,12 +1,12 @@
-package ua.simpleservletframework.core.annotation.annotation.mapping;
+package ua.simpleservletframework.core.annotation.annotation.component;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD)
+@Target({ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface OptionsMapping {
-    String value() default "/";
+public @interface Component {
+    String value();
 }

@@ -1,4 +1,4 @@
-package ua.simpleservletframework.core.filter;
+package ua.simpleservletframework.mvc.filter;
 
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-import static ua.simpleservletframework.core.util.RequestMethod.*;
+import static ua.simpleservletframework.mvc.utils.RequestMethod.*;
 
 @WebFilter(asyncSupported = true, urlPatterns = {"/*"})
 public class CORSFilter implements Filter {

@@ -11,7 +11,7 @@ public class BeanImplementation<T> {
         if (!beans.containsKey(id)) {
             beans.put(id, clazz.getConstructor().newInstance());
         } else {
-            throw new RuntimeException("Bean with id " + id + " is already exists!");
+            throw new RuntimeException("Bean with id " + id + " already exists!");
         }
     }
 
@@ -21,11 +21,19 @@ public class BeanImplementation<T> {
         if (instance == null) {
             synchronized (instance.getClass()) {
                 if (instance == null) {
-                    beans.put(id, instance.getClass().getConstructor().newInstance());
+                    beans.put(id, (T) instance.getClass().getConstructor().newInstance());
                     instance = (T) beans.get(id);
                 }
             }
         }
         return instance;
+    }
+
+    @SuppressWarnings("all")
+    public static Map.Entry<String, ?> getBean(Class<?> type) {
+        return beans.entrySet().stream()
+                .filter(bean -> bean.getValue().getClass().getTypeName().equals(type.getTypeName()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Cannot inject bean. Required bean not found"));
     }
 }

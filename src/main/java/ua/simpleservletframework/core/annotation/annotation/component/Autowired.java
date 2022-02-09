@@ -1,12 +1,12 @@
-package ua.simpleservletframework.core.annotation.annotation.controller;
+package ua.simpleservletframework.core.annotation.annotation.component;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.TYPE)
+@Target({ElementType.FIELD, ElementType.CONSTRUCTOR})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RestController {
-    String value() default "/";
+public @interface Autowired {
+    String value() default "";
 }

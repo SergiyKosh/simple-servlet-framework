@@ -1,7 +1,7 @@
-package ua.simpleservletframework.core.ui;
+package ua.simpleservletframework.mvc.ui;
 
 import jakarta.servlet.http.HttpServletRequest;
-import ua.simpleservletframework.core.servlet.DispatcherServlet;
+import ua.simpleservletframework.mvc.servlet.DispatcherServlet;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -9,6 +9,10 @@ import java.util.*;
 public class Model {
     public void addAttribute(String name, @Nullable Object value) {
         DispatcherServlet.request.setAttribute(name, value);
+    }
+
+    public String getParameter(String name) {
+        return DispatcherServlet.request.getParameter(name);
     }
 
     public void addAllAttributes(Map<String, ?> attributes) {

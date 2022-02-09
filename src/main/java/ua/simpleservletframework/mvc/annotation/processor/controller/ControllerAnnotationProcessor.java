@@ -1,10 +1,9 @@
-package ua.simpleservletframework.core.annotation.processor;
+package ua.simpleservletframework.mvc.annotation.processor.controller;
 
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
-import ua.simpleservletframework.core.annotation.annotation.controller.Controller;
-import ua.simpleservletframework.core.annotation.annotation.controller.RestController;
-import ua.simpleservletframework.core.util.PropertyUtil;
+import ua.simpleservletframework.mvc.annotation.annotation.controller.Controller;
+import ua.simpleservletframework.mvc.annotation.annotation.controller.RestController;
 
 import java.util.HashSet;
 import java.util.Set;
