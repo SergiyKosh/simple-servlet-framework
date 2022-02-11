@@ -22,7 +22,7 @@ This project is being developed by me for improve my knowledge in Reflection and
 ## Modules
 ### Core
 #### - Annotations @Component and @Service
-    This annotations are used over classes for instantiate singletones (beans) after deployment. 
+    These annotations are used over classes for instantiate singletones (beans) after deployment. 
     There is no different between them. @Service annotation was created for convenience while writing code and uses over classes that doing business logic.
 #### - Context class
     This class created for getting beans
