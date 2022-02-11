@@ -7,6 +7,7 @@ import ua.simpleservletframework.core.annotation.processor.component.AutowiredAn
 import ua.simpleservletframework.core.annotation.processor.component.BeanAnnotationProcessor;
 import ua.simpleservletframework.core.util.PropertyUtil;
 
+import java.util.Optional;
 import java.util.Set;
 
 @WebListener
@@ -14,7 +15,10 @@ public class ContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try {
-            Class.forName(PropertyUtil.getProperty("db.driver"));
+            String driverProp = PropertyUtil.getProperty("db.driver");
+            if (driverProp != null) {
+                Class.forName(driverProp);
+            }
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
