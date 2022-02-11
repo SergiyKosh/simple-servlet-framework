@@ -3,7 +3,6 @@ package ua.simpleservletframework.core.context;
 import ua.simpleservletframework.core.beans.BeanImplementation;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Type;
 import java.util.Map;
 
 public class Context<T> {

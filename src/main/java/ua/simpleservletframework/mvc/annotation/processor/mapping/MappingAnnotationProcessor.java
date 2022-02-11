@@ -1,14 +1,13 @@
 package ua.simpleservletframework.mvc.annotation.processor.mapping;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import ua.simpleservletframework.core.context.Context;
 import ua.simpleservletframework.mvc.annotation.annotation.controller.Controller;
 import ua.simpleservletframework.mvc.annotation.annotation.controller.RestController;
-import ua.simpleservletframework.core.context.Context;
-import ua.simpleservletframework.mvc.servlet.DispatcherServlet;
 import ua.simpleservletframework.mvc.annotation.annotation.mapping.*;
+import ua.simpleservletframework.mvc.servlet.DispatcherServlet;
 import ua.simpleservletframework.mvc.utils.MappingUtils;
 
 import java.io.IOException;
