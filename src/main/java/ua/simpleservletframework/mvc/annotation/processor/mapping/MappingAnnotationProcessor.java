@@ -7,6 +7,7 @@ import ua.simpleservletframework.core.context.Context;
 import ua.simpleservletframework.mvc.annotation.annotation.controller.Controller;
 import ua.simpleservletframework.mvc.annotation.annotation.controller.RestController;
 import ua.simpleservletframework.mvc.annotation.annotation.mapping.*;
+import ua.simpleservletframework.mvc.annotation.annotation.url.PathVariable;
 import ua.simpleservletframework.mvc.servlet.DispatcherServlet;
 import ua.simpleservletframework.mvc.utils.MappingUtils;
 
@@ -20,8 +21,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ua.simpleservletframework.core.util.Constants.*;
+import static ua.simpleservletframework.mvc.utils.MappingUtils.getMappingMethodResult;
+import static ua.simpleservletframework.mvc.utils.MappingUtils.getPVValues;
 import static ua.simpleservletframework.mvc.utils.RequestMethod.*;
-import static ua.simpleservletframework.mvc.utils.UriUtils.formatRequestUri;
+import static ua.simpleservletframework.mvc.utils.UriUtils.*;
 
 public class MappingAnnotationProcessor {
     private final Context<?> context = new Context<>();
@@ -34,10 +37,16 @@ public class MappingAnnotationProcessor {
                     if (c.isAnnotationPresent(Controller.class)) {
                         if (request.getMethod().equals(GET)) {
                             return Arrays.stream(c.getDeclaredMethods())
-                                    .anyMatch(rm -> rm.isAnnotationPresent(GetMapping.class)
-                                            &&
-                                            formatRequestUri(c.getAnnotation(Controller.class).value(), rm.getAnnotation(GetMapping.class).value())
-                                                    .equals(requestUri));
+                                    .anyMatch(rm -> {
+                                        String cUri = c.getAnnotation(Controller.class).value();
+                                        String rUri = rm.getAnnotation(GetMapping.class).value();
+                                        String reqUri = formatRequestUri(cUri, rUri);
+                                        String[] injected = injectPathVariableIfExists(requestUri, reqUri);
+                                        String collected = collectUri(injected);
+                                        return rm.isAnnotationPresent(GetMapping.class)
+                                                &&
+                                               collected.equals(requestUri);
+                                    });
                         } else if (request.getMethod().equals(POST)) {
                             return Arrays.stream(c.getDeclaredMethods())
                                     .anyMatch(rm -> rm.isAnnotationPresent(PostMapping.class)
@@ -114,10 +123,14 @@ public class MappingAnnotationProcessor {
                             .filter(m -> {
                                 if (c.isAnnotationPresent(Controller.class)) {
                                     if (m.isAnnotationPresent(GetMapping.class)) {
+                                        String cUri = c.getAnnotation(Controller.class).value();
+                                        String rUri = m.getAnnotation(GetMapping.class).value();
+                                        String reqUri = formatRequestUri(cUri, rUri);
+                                        String[] injected = injectPathVariableIfExists(requestUri, reqUri);
+                                        String collected = collectUri(injected);
                                         return m.isAnnotationPresent(GetMapping.class)
                                                 &&
-                                                formatRequestUri(c.getAnnotation(Controller.class).value(), m.getAnnotation(GetMapping.class).value())
-                                                        .equals(requestUri);
+                                                collected.equals(requestUri);
                                     } else if (m.isAnnotationPresent(PostMapping.class)) {
                                         return m.isAnnotationPresent(PostMapping.class)
                                                 &&
@@ -195,8 +208,7 @@ public class MappingAnnotationProcessor {
             Method mapping
     ) {
         try {
-            Object result = mapping.invoke(context.getBean(controller).getValue());
-
+            Object result = getMappingMethodResult(context, controller, mapping);
             mappingUtils.mappingHandler(result, controller);
         } catch (IllegalAccessException | InvocationTargetException | ServletException
                 | IOException e) {
@@ -208,7 +220,7 @@ public class MappingAnnotationProcessor {
             Class<?> controller,
             Method mapping
     ) throws InvocationTargetException, IllegalAccessException, IOException, ServletException {
-        Object result = mapping.invoke(context.getBean(controller).getValue());
+        Object result = getMappingMethodResult(context, controller, mapping);
         mappingUtils.mappingHandler(result, controller);
     }
 
