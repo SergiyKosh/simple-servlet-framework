@@ -3,30 +3,39 @@ package ua.simpleservletframework.core.annotation.processor.component;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import ua.simpleservletframework.core.annotation.annotation.component.Autowired;
-import ua.simpleservletframework.mvc.annotation.annotation.controller.RestController;
+import ua.simpleservletframework.core.annotation.annotation.component.Component;
+import ua.simpleservletframework.core.annotation.annotation.component.Service;
 import ua.simpleservletframework.core.beans.BeanImplementation;
 import ua.simpleservletframework.core.context.Context;
+import ua.simpleservletframework.mvc.annotation.annotation.controller.Controller;
+import ua.simpleservletframework.mvc.annotation.annotation.controller.RestController;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.reflections.util.ClasspathHelper.forClassLoader;
-
 public class AutowiredAnnotationProcessor {
-    private Set<Field> autowiredFields() {
-        return new Reflections(forClassLoader()).getFieldsAnnotatedWith(Autowired.class);
-    }
-
     private Map.Entry<String, ?> searchBean(Field field) {
         field.setAccessible(true);
         return BeanImplementation.getBean(field.getType());
     }
 
     public void injectBeans() {
-        Set<Class<?>> getAllRestControllers = new Reflections(ClasspathHelper.forClassLoader()).getTypesAnnotatedWith(RestController.class);
-        getAllRestControllers.forEach(controller -> {
+        Reflections reflections = new Reflections(ClasspathHelper.forClassLoader());
+        Set<Class<?>> getRestControllers = reflections.getTypesAnnotatedWith(RestController.class);
+        Set<Class<?>> getControllers = reflections.getTypesAnnotatedWith(Controller.class);
+        Set<Class<?>> getComponents = reflections.getTypesAnnotatedWith(Component.class);
+        Set<Class<?>> getServices = reflections.getTypesAnnotatedWith(Service.class);
+        Set<Class<?>> getAllControllers = new HashSet<>();
+
+        getAllControllers.addAll(getRestControllers);
+        getAllControllers.addAll(getControllers);
+        getAllControllers.addAll(getComponents);
+        getAllControllers.addAll(getServices);
+
+        getAllControllers.forEach(controller -> {
             if (controller.getDeclaredFields().length != 0) {
                 Arrays.stream(controller.getDeclaredFields())
                         .forEach(field -> {

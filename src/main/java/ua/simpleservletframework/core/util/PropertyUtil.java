@@ -12,9 +12,13 @@ public class PropertyUtil {
         InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("application.properties");
 
         try {
-            PROPERTIES.load(Optional.ofNullable(stream)
-                    .orElseThrow(() -> new RuntimeException("application.properties file does not exists in your classpath"))
-            );
+            synchronized (PropertyUtil.class) {
+                if (PROPERTIES.isEmpty()) {
+                    PROPERTIES.load(Optional.ofNullable(stream)
+                            .orElseThrow(() -> new RuntimeException("application.properties file does not exists in your classpath"))
+                    );
+                }
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -26,5 +30,8 @@ public class PropertyUtil {
 
     public static String getProperty(String key) {
         return PROPERTIES.getProperty(key);
+    }
+
+    private PropertyUtil() {
     }
 }
