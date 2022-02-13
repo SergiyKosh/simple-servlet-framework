@@ -19,6 +19,7 @@ This project is being developed by me for improve my knowledge in Reflection and
 6. @Autowired for injecting beans;
 7. Connection pool;
 8. Auto-creation tables in the database;
+9. @PathVariable annotation is used on the values of storage path variables.
 ## Modules
 ### Core
 #### - Annotations @Component and @Service
