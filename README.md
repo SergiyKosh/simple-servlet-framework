@@ -37,6 +37,8 @@ This project is being developed by me for improve my knowledge in Reflection and
     Difference between them in the data mapping. @Controller displaying data as jsp page, @RestController - as JSON.
 #### - @GetMapping, @PostMapping, @PutMapping, @DeleteMapping, @OptionsMapping
     These annotations are used over the methods in the controller class for handling certain types of requests.
+#### - @PathVariable annotation
+    This annotation is used on the values of storage path variables.
 #### - CORSFilter
     It is used to avoid CORS block.
 #### - Model
