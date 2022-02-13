@@ -145,18 +145,34 @@ public class MappingUtils {
 
     private static String getUriFromMapping(Method method) {
         if (request.getMethod().equals(RequestMethod.GET)) {
-            return method.getAnnotation(GetMapping.class).value();
+            if (method.isAnnotationPresent(GetMapping.class)) {
+                return method.getAnnotation(GetMapping.class).value();
+            }
         } else if (request.getMethod().equals(RequestMethod.POST)) {
-            return method.getAnnotation(PostMapping.class).value();
+            if (method.isAnnotationPresent(PostMapping.class)) {
+                return method.getAnnotation(PostMapping.class).value();
+            }
         } else if (request.getMethod().equals(RequestMethod.PUT)) {
-            return method.getAnnotation(PutMapping.class).value();
+            if (method.isAnnotationPresent(PutMapping.class)) {
+                return method.getAnnotation(PutMapping.class).value();
+            }
         } else if (request.getMethod().equals(RequestMethod.DELETE)) {
-            return method.getAnnotation(DeleteMapping.class).value();
+            if (method.isAnnotationPresent(DeleteMapping.class)) {
+                return method.getAnnotation(DeleteMapping.class).value();
+            }
         } else if (request.getMethod().equals(RequestMethod.OPTIONS)) {
-            return method.getAnnotation(OptionsMapping.class).value();
+            if (method.isAnnotationPresent(OptionsMapping.class)) {
+                return method.getAnnotation(OptionsMapping.class).value();
+            }
+        } else if (request.getMethod().equals(RequestMethod.PATCH)) {
+            if (method.isAnnotationPresent(PatchMapping.class)) {
+                return method.getAnnotation(PatchMapping.class).value();
+            }
         } else {
             throw new RuntimeException(UNKNOWN_REQUEST_TYPE);
         }
+
+        return "";
     }
 }
 

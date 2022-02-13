@@ -7,7 +7,6 @@ import ua.simpleservletframework.core.context.Context;
 import ua.simpleservletframework.mvc.annotation.annotation.controller.Controller;
 import ua.simpleservletframework.mvc.annotation.annotation.controller.RestController;
 import ua.simpleservletframework.mvc.annotation.annotation.mapping.*;
-import ua.simpleservletframework.mvc.annotation.annotation.url.PathVariable;
 import ua.simpleservletframework.mvc.servlet.DispatcherServlet;
 import ua.simpleservletframework.mvc.utils.MappingUtils;
 
@@ -21,9 +20,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ua.simpleservletframework.core.util.Constants.*;
-import static ua.simpleservletframework.mvc.utils.MappingUtils.*;
+import static ua.simpleservletframework.mvc.utils.MappingUtils.getMappingMethodResult;
 import static ua.simpleservletframework.mvc.utils.RequestMethod.*;
-import static ua.simpleservletframework.mvc.utils.UriUtils.*;
 
 public class MappingAnnotationProcessor {
     private final Context<?> context = new Context<>();
@@ -91,8 +89,10 @@ public class MappingAnnotationProcessor {
                                     return m.isAnnotationPresent(PutMapping.class);
                                 } else if (request.getMethod().equals(DELETE)) {
                                     return m.isAnnotationPresent(DeleteMapping.class);
-                                } else {
+                                } else if (request.getMethod().equals(OPTIONS)) {
                                     return m.isAnnotationPresent(OptionsMapping.class);
+                                } else {
+                                    return m.isAnnotationPresent(PatchMapping.class);
                                 }
                             })
                             .findFirst()
@@ -141,6 +141,8 @@ public class MappingAnnotationProcessor {
                     mapping.isAnnotationPresent(PutMapping.class)
                             || mapping.isAnnotationPresent(PostMapping.class)
                             || mapping.isAnnotationPresent(DeleteMapping.class)
+                            || mapping.isAnnotationPresent(PatchMapping.class)
+                            || mapping.isAnnotationPresent(OptionsMapping.class)
             ) {
                 otherRequestTypesHandler(controller, mapping);
             }

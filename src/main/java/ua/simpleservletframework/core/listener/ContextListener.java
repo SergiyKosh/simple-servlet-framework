@@ -7,7 +7,6 @@ import ua.simpleservletframework.core.annotation.processor.component.AutowiredAn
 import ua.simpleservletframework.core.annotation.processor.component.BeanAnnotationProcessor;
 import ua.simpleservletframework.core.util.PropertyUtil;
 
-import java.util.Optional;
 import java.util.Set;
 
 @WebListener
