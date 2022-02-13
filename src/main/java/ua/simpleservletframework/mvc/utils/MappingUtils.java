@@ -9,11 +9,12 @@ import ua.simpleservletframework.mvc.annotation.annotation.mapping.*;
 import ua.simpleservletframework.mvc.servlet.DispatcherServlet;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.stream.Stream;
@@ -46,21 +47,6 @@ public class MappingUtils {
             }
         }
     }
-
-//    public static Map<String, String> getPVValues(String uri) {
-//        String[] uriArr = uri.split("/");
-//        String[] reqUriArr = DispatcherServlet.request.getRequestURI().split("/");
-//
-//        Map<String, String> pathVariables = new HashMap<>();
-//
-//        for (int i = 0; i < uriArr.length; i++) {
-//            if (!reqUriArr[i].equals(uriArr[i])) {
-//                pathVariables.put(uriArr[i].substring(1, uriArr[i].length() - 1), reqUriArr[i]);
-//            }
-//        }
-//
-//        return pathVariables;
-//    }
 
     public static Map<String, String> getPVValues(String uri, String cUri) {
         String[] cUriArr = cUri.split("/");
@@ -159,7 +145,7 @@ public class MappingUtils {
 
     private static String getUriFromMapping(Method method) {
         if (request.getMethod().equals(RequestMethod.GET)) {
-            return method.getAnnotation(GetMapping.class).value(); //на каком-то из этапов не отсеиваются остальные типы запросов
+            return method.getAnnotation(GetMapping.class).value();
         } else if (request.getMethod().equals(RequestMethod.POST)) {
             return method.getAnnotation(PostMapping.class).value();
         } else if (request.getMethod().equals(RequestMethod.PUT)) {
