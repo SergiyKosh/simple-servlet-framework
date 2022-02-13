@@ -21,8 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ua.simpleservletframework.core.util.Constants.*;
-import static ua.simpleservletframework.mvc.utils.MappingUtils.getMappingMethodResult;
-import static ua.simpleservletframework.mvc.utils.MappingUtils.getPVValues;
+import static ua.simpleservletframework.mvc.utils.MappingUtils.*;
 import static ua.simpleservletframework.mvc.utils.RequestMethod.*;
 import static ua.simpleservletframework.mvc.utils.UriUtils.*;
 
@@ -35,81 +34,25 @@ public class MappingAnnotationProcessor {
         return controllers.stream()
                 .filter(c -> {
                     if (c.isAnnotationPresent(Controller.class)) {
-                        if (request.getMethod().equals(GET)) {
-                            return Arrays.stream(c.getDeclaredMethods())
-                                    .anyMatch(rm -> {
-                                        String cUri = c.getAnnotation(Controller.class).value();
-                                        String rUri = rm.getAnnotation(GetMapping.class).value();
-                                        String reqUri = formatRequestUri(cUri, rUri);
-                                        String[] injected = injectPathVariableIfExists(requestUri, reqUri);
-                                        String collected = collectUri(injected);
-                                        return rm.isAnnotationPresent(GetMapping.class)
-                                                &&
-                                               collected.equals(requestUri);
-                                    });
-                        } else if (request.getMethod().equals(POST)) {
-                            return Arrays.stream(c.getDeclaredMethods())
-                                    .anyMatch(rm -> rm.isAnnotationPresent(PostMapping.class)
-                                            &&
-                                            formatRequestUri(c.getAnnotation(Controller.class).value(), rm.getAnnotation(PostMapping.class).value())
-                                                    .equals(requestUri));
-                        } else if (request.getMethod().equals(PUT)) {
-                            return Arrays.stream(c.getDeclaredMethods())
-                                    .anyMatch(rm -> rm.isAnnotationPresent(PutMapping.class)
-                                            &&
-                                            formatRequestUri(c.getAnnotation(Controller.class).value(), rm.getAnnotation(PutMapping.class).value())
-                                                    .equals(requestUri));
-                        } else if (request.getMethod().equals(DELETE)) {
-                            return Arrays.stream(c.getDeclaredMethods())
-                                    .anyMatch(rm -> rm.isAnnotationPresent(DeleteMapping.class)
-                                            &&
-                                            formatRequestUri(c.getAnnotation(Controller.class).value(), rm.getAnnotation(DeleteMapping.class).value())
-                                                    .equals(requestUri));
-                        } else if (request.getMethod().equals(OPTIONS)) {
-                            return Arrays.stream(c.getDeclaredMethods())
-                                    .anyMatch(rm -> rm.isAnnotationPresent(OptionsMapping.class)
-                                            &&
-                                            formatRequestUri(c.getAnnotation(Controller.class).value(), rm.getAnnotation(OptionsMapping.class).value())
-                                                    .equals(requestUri));
+                        if (requestUri.startsWith(c.getAnnotation(Controller.class).value())) {
+                            return MappingUtils.getRequiredControllers(
+                                    c, requestUri,
+                                    c.getAnnotation(Controller.class).value()
+                            );
                         } else {
-                            throw new RuntimeException(UNKNOWN_REQUEST_TYPE);
+                            return false;
                         }
                     } else if (c.isAnnotationPresent(RestController.class)) {
-                        if (request.getMethod().equals(GET)) {
-                            return Arrays.stream(c.getDeclaredMethods())
-                                    .anyMatch(rm -> rm.isAnnotationPresent(GetMapping.class)
-                                            &&
-                                            formatRequestUri(c.getAnnotation(RestController.class).value(), rm.getAnnotation(GetMapping.class).value())
-                                                    .equals(requestUri));
-                        } else if (request.getMethod().equals(POST)) {
-                            return Arrays.stream(c.getDeclaredMethods())
-                                    .anyMatch(rm -> rm.isAnnotationPresent(PostMapping.class)
-                                            &&
-                                            formatRequestUri(c.getAnnotation(RestController.class).value(), rm.getAnnotation(PostMapping.class).value())
-                                                    .equals(requestUri));
-                        } else if (request.getMethod().equals(PUT)) {
-                            return Arrays.stream(c.getDeclaredMethods())
-                                    .anyMatch(rm -> rm.isAnnotationPresent(PutMapping.class)
-                                            &&
-                                            formatRequestUri(c.getAnnotation(RestController.class).value(), rm.getAnnotation(PutMapping.class).value())
-                                                    .equals(requestUri));
-                        } else if (request.getMethod().equals(DELETE)) {
-                            return Arrays.stream(c.getDeclaredMethods())
-                                    .anyMatch(rm -> rm.isAnnotationPresent(DeleteMapping.class)
-                                            &&
-                                            formatRequestUri(c.getAnnotation(RestController.class).value(), rm.getAnnotation(DeleteMapping.class).value())
-                                                    .equals(requestUri));
-                        } else if (request.getMethod().equals(OPTIONS)) {
-                            return Arrays.stream(c.getDeclaredMethods())
-                                    .anyMatch(rm -> rm.isAnnotationPresent(OptionsMapping.class)
-                                            &&
-                                            formatRequestUri(c.getAnnotation(RestController.class).value(), rm.getAnnotation(OptionsMapping.class).value())
-                                                    .equals(requestUri));
+                        if (requestUri.startsWith(c.getAnnotation(RestController.class).value())) {
+                            return MappingUtils.getRequiredControllers(
+                                    c, requestUri,
+                                    c.getAnnotation(RestController.class).value()
+                            );
                         } else {
-                            throw new RuntimeException(UNKNOWN_REQUEST_TYPE);
+                            return false;
                         }
                     } else {
-                        throw new RuntimeException(MULTIPLE_CONTROLLER_TYPE_EXCEPTION);
+                        throw new RuntimeException(UNKNOWN_CONTROLLER_TYPE);
                     }
                 })
                 .collect(Collectors.toSet());
@@ -122,63 +65,9 @@ public class MappingAnnotationProcessor {
                     Method mapping = Arrays.stream(c.getDeclaredMethods())
                             .filter(m -> {
                                 if (c.isAnnotationPresent(Controller.class)) {
-                                    if (m.isAnnotationPresent(GetMapping.class)) {
-                                        String cUri = c.getAnnotation(Controller.class).value();
-                                        String rUri = m.getAnnotation(GetMapping.class).value();
-                                        String reqUri = formatRequestUri(cUri, rUri);
-                                        String[] injected = injectPathVariableIfExists(requestUri, reqUri);
-                                        String collected = collectUri(injected);
-                                        return m.isAnnotationPresent(GetMapping.class)
-                                                &&
-                                                collected.equals(requestUri);
-                                    } else if (m.isAnnotationPresent(PostMapping.class)) {
-                                        return m.isAnnotationPresent(PostMapping.class)
-                                                &&
-                                                formatRequestUri(c.getAnnotation(Controller.class).value(), m.getAnnotation(PostMapping.class).value())
-                                                        .equals(requestUri);
-                                    } else if (m.isAnnotationPresent(PutMapping.class)) {
-                                        return m.isAnnotationPresent(PutMapping.class)
-                                                &&
-                                                formatRequestUri(c.getAnnotation(Controller.class).value(), m.getAnnotation(PutMapping.class).value())
-                                                        .equals(requestUri);
-                                    } else if (m.isAnnotationPresent(DeleteMapping.class)) {
-                                        return m.isAnnotationPresent(DeleteMapping.class)
-                                                &&
-                                                formatRequestUri(c.getAnnotation(Controller.class).value(), m.getAnnotation(DeleteMapping.class).value())
-                                                        .equals(requestUri);
-                                    } else {
-                                        return m.isAnnotationPresent(OptionsMapping.class)
-                                                &&
-                                                formatRequestUri(c.getAnnotation(Controller.class).value(), m.getAnnotation(OptionsMapping.class).value())
-                                                        .equals(requestUri);
-                                    }
+                                    return MappingUtils.getRequiredMethod(m, requestUri, c.getAnnotation(Controller.class).value());
                                 } else if (c.isAnnotationPresent(RestController.class)) {
-                                    if (m.isAnnotationPresent(GetMapping.class)) {
-                                        return m.isAnnotationPresent(GetMapping.class)
-                                                &&
-                                                formatRequestUri(c.getAnnotation(RestController.class).value(), m.getAnnotation(GetMapping.class).value())
-                                                        .equals(requestUri);
-                                    } else if (m.isAnnotationPresent(PostMapping.class)) {
-                                        return m.isAnnotationPresent(PostMapping.class)
-                                                &&
-                                                formatRequestUri(c.getAnnotation(RestController.class).value(), m.getAnnotation(PostMapping.class).value())
-                                                        .equals(requestUri);
-                                    } else if (m.isAnnotationPresent(PutMapping.class)) {
-                                        return m.isAnnotationPresent(PutMapping.class)
-                                                &&
-                                                formatRequestUri(c.getAnnotation(RestController.class).value(), m.getAnnotation(PutMapping.class).value())
-                                                        .equals(requestUri);
-                                    } else if (m.isAnnotationPresent(DeleteMapping.class)) {
-                                        return m.isAnnotationPresent(DeleteMapping.class)
-                                                &&
-                                                formatRequestUri(c.getAnnotation(RestController.class).value(), m.getAnnotation(DeleteMapping.class).value())
-                                                        .equals(requestUri);
-                                    } else {
-                                        return m.isAnnotationPresent(OptionsMapping.class)
-                                                &&
-                                                formatRequestUri(c.getAnnotation(RestController.class).value(), m.getAnnotation(OptionsMapping.class).value())
-                                                        .equals(requestUri);
-                                    }
+                                    return MappingUtils.getRequiredMethod(m, requestUri, c.getAnnotation(RestController.class).value());
                                 } else {
                                     throw new RuntimeException(MULTIPLE_CONTROLLER_TYPE_EXCEPTION);
                                 }

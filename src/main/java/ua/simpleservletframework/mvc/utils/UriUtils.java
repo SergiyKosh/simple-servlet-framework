@@ -1,7 +1,7 @@
 package ua.simpleservletframework.mvc.utils;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class UriUtils {
     public static String formatRequestUri(String cUri, String rmUri) {
@@ -29,12 +29,22 @@ public class UriUtils {
     }
 
     public static String collectUri(String[] uri) {
-        String returnedUri;
-
         for (int i = 0; i < uri.length; i++) {
             uri[i] = "/" + uri[i];
         }
 
         return String.join("", uri).substring(1);
+    }
+
+    public static String collectUri(AtomicReference<AtomicReferenceArray<String>> uri) {
+        for (int i = 0; i < uri.get().length(); i++) {
+            uri.get().set(i, "/" + uri.get().get(i));
+        }
+
+        return String.join("", uri.get().toString())
+                .replaceAll("\\,", "")
+                .replaceAll("\\]", "")
+                .replaceAll(" ", "")
+                .substring(2);
     }
 }
