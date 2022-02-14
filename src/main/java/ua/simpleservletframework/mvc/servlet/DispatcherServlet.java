@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
+import static ua.simpleservletframework.mvc.utils.MappingUtils.getResourcePath;
+import static ua.simpleservletframework.mvc.utils.MappingUtils.setImage;
+
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
     public static volatile HttpServletRequest request;
@@ -19,11 +22,19 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Set<Class<?>> controllers = new ControllerAnnotationProcessor().getAllControllerClasses();
-        try {
-            new MappingAnnotationProcessor().mappingHandler(controllers, request, response);
-        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException | ServletException e) {
-            throw new RuntimeException(e);
+        if (request.getRequestURI().endsWith(".jpg")) {
+            String path;
+            String[] uri = request.getRequestURI().split("/");
+            response.setContentType("image/jpeg");
+            path = getResourcePath(uri);
+            setImage(path, response.getOutputStream(), getServletContext().getResourceAsStream(path));
+        } else {
+            Set<Class<?>> controllers = new ControllerAnnotationProcessor().getAllControllerClasses();
+            try {
+                new MappingAnnotationProcessor().mappingHandler(controllers, request, response);
+            } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException | ServletException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

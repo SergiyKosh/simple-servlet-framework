@@ -9,6 +9,8 @@ import ua.simpleservletframework.mvc.annotation.annotation.mapping.*;
 import ua.simpleservletframework.mvc.servlet.DispatcherServlet;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -173,6 +175,26 @@ public class MappingUtils {
         }
 
         return "";
+    }
+
+    public static String getResourcePath(String[] uri) {
+        if (!uri[1].equals("resources")) {
+            uri[1] = "";
+        }
+        for (int i = 2; i < uri.length - 1; i++) {
+            uri[i] += "/";
+        }
+        return String.join("", uri);
+    }
+
+    public static void setImage(String path, OutputStream os, InputStream is) throws IOException {
+        try (InputStream inputStream = is) {
+            byte[] bytes = new byte[4096];
+            int b;
+            while ((b = inputStream.read(bytes)) != -1) {
+                os.write(bytes, 0, b);
+            }
+        }
     }
 }
 
