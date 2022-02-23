@@ -52,7 +52,7 @@ This project is being developed by me for improve my knowledge in Reflection and
     This annotation used to instantiating DAO component after deployment.
 #### - DatabaseConnection interface, ConnectionFactory, ConnectionPool, DataSource classes
     They are used for getting connection with the database.
-## Projects which will be written using this framework
+## Projects written using this framework
 1. [Company API](https://github.com/SergiyKosh/servlet-api)
 
     This project demonstrates features of my framework.
