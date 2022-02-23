@@ -18,7 +18,7 @@ import java.util.Set;
 public class AutowiredAnnotationProcessor {
     private Map.Entry<String, ?> searchBean(Field field) {
         field.setAccessible(true);
-        return BeanImplementation.getBean(field.getType());
+        return BeanImplementation.getBean(field);
     }
 
     public void injectBeans() {
