@@ -1,7 +1,7 @@
 package ua.simpleservletframework.data.pool;
 
-import ua.simpleservletframework.data.connection.DatabaseConnection;
 import ua.simpleservletframework.data.source.DataSource;
+import ua.simpleservletframework.data.connection.DatabaseConnection;
 
 import java.sql.Connection;
 

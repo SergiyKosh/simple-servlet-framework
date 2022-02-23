@@ -3,8 +3,8 @@ package ua.simpleservletframework.core.listener;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
-import ua.simpleservletframework.core.annotation.processor.component.AutowiredAnnotationProcessor;
-import ua.simpleservletframework.core.annotation.processor.component.BeanAnnotationProcessor;
+import ua.simpleservletframework.core.beans.AutowiredAnnotationProcessor;
+import ua.simpleservletframework.core.beans.BeanAnnotationProcessor;
 import ua.simpleservletframework.core.util.PropertyUtil;
 
 import java.util.Set;

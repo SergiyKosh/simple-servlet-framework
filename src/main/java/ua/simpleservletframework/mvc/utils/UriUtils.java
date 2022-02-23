@@ -41,14 +41,10 @@ public class UriUtils {
             uri.get().set(i, "/" + uri.get().get(i));
         }
 
-        if (uri.get().length() > 0) {
-            return String.join("", uri.get().toString())
-                    .replaceAll("\\,", "")
-                    .replaceAll("\\]", "")
-                    .replaceAll(" ", "")
-                    .substring(2);
-        } else {
-            return "/";
-        }
+        return String.join("", uri.get().toString())
+                .replaceAll("\\,", "")
+                .replaceAll("\\]", "")
+                .replaceAll(" ", "")
+                .substring(2);
     }
 }

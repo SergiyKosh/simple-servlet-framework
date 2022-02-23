@@ -7,8 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-import static ua.simpleservletframework.mvc.utils.RequestMethod.OPTIONS;
-import static ua.simpleservletframework.mvc.utils.RequestMethod.PUT;
+import static ua.simpleservletframework.mvc.utils.RequestMethod.*;
 
 @WebFilter(asyncSupported = true, urlPatterns = {"/*"})
 public class CORSFilter implements Filter {

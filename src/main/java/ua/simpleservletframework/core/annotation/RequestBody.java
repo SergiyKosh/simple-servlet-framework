@@ -1,12 +1,11 @@
-package ua.simpleservletframework.core.annotation.annotation.component;
+package ua.simpleservletframework.core.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.FIELD, ElementType.CONSTRUCTOR})
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Autowired {
-    String value() default "";
+public @interface RequestBody {
 }

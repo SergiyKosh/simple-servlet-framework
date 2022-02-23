@@ -1,4 +1,4 @@
-package ua.simpleservletframework.core.annotation.annotation.component;
+package ua.simpleservletframework.core.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

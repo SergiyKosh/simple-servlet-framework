@@ -50,4 +50,12 @@ This project is being developed by me for improve my knowledge in Reflection and
 #### - DatabaseConnection interface, ConnectionFactory, ConnectionPool, DataSource classes
     They are used for getting connection with the database.
 ## Projects which will be written using this framework
-Link to a project that will be demonstrate framework features will be here :)
+1. [Company API] (https://github.com/SergiyKosh/servlet-api)
+    This project demonstrates features of my framework.
+
+    Database: PostgreSQL; 
+    Framework: 
+    1. @RestController, @Service, @PathVariable, @Component, @ComponentDao, @Get,Put,Post,DeleteMapping and @Autowired annotations.
+    2. Connection pool.
+
+    It's a RESTful API that can do CRUD operations on JSON format. In addition to this API, a client will be created using this framework.

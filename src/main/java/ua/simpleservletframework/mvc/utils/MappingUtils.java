@@ -2,18 +2,20 @@ package ua.simpleservletframework.mvc.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
+import lombok.SneakyThrows;
+import ua.simpleservletframework.core.annotation.RequestBody;
 import ua.simpleservletframework.core.context.Context;
 import ua.simpleservletframework.mvc.annotation.annotation.controller.Controller;
 import ua.simpleservletframework.mvc.annotation.annotation.controller.RestController;
 import ua.simpleservletframework.mvc.annotation.annotation.mapping.*;
+import ua.simpleservletframework.mvc.annotation.annotation.url.PathVariable;
 import ua.simpleservletframework.mvc.servlet.DispatcherServlet;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -79,6 +81,19 @@ public class MappingUtils {
         return pathVariables;
     }
 
+    @SneakyThrows
+    private static <T> T getRequestBody(Class<T> valueType) {
+        return new ObjectMapper().readValue(request.getInputStream(), valueType);
+    }
+
+    private static Class<?> getValueFromRequestBody(Method mapping) {
+        return Arrays.stream(mapping.getParameters())
+                .filter(parameter -> parameter.isAnnotationPresent(RequestBody.class))
+                .map(Parameter::getType)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Could not to find requested body"));
+    }
+
     public static Object getMappingMethodResult(
             Context<?> context,
             Class<?> controller,
@@ -92,13 +107,38 @@ public class MappingUtils {
             } else {
                 cUri = controller.getAnnotation(RestController.class).value();
             }
-            String[] pathVars = getPVValues(
-                    getUriFromMapping(mapping),
-                    cUri
-            )
-                    .values()
-                    .toArray(new String[0]);
-            result = mapping.invoke(context.getBean(controller).getValue(), pathVars);
+
+            if (Arrays.stream(mapping.getParameters())
+                    .anyMatch(parameter -> parameter.isAnnotationPresent(PathVariable.class)) &&
+                    Arrays.stream(mapping.getParameters())
+                            .noneMatch(parameter -> parameter.isAnnotationPresent(RequestBody.class))
+            ) {
+                String[] pathVars = getPVValues(
+                        getUriFromMapping(mapping),
+                        cUri
+                )
+                        .values()
+                        .toArray(new String[0]);
+                result = mapping.invoke(context.getBean(controller).getValue(), pathVars);
+            } else if (Arrays.stream(mapping.getParameters())
+                    .anyMatch(parameter -> parameter.isAnnotationPresent(RequestBody.class)) &&
+                    Arrays.stream(mapping.getParameters())
+                            .noneMatch(parameter -> parameter.isAnnotationPresent(PathVariable.class))
+            ) {
+                Class<?> value = getValueFromRequestBody(mapping);
+                Object requestBody = getRequestBody(value);
+                result = mapping.invoke(context.getBean(controller).getValue(), requestBody);
+            } else {
+                String[] pathVars = getPVValues(
+                        getUriFromMapping(mapping),
+                        cUri
+                )
+                        .values()
+                        .toArray(new String[0]);
+                Class<?> value = getValueFromRequestBody(mapping);
+                Object requestBody = getRequestBody(value);
+                result = mapping.invoke(context.getBean(controller).getValue(), pathVars, requestBody);
+            }
         } else {
             result = mapping.invoke(context.getBean(controller).getValue());
         }
@@ -175,26 +215,6 @@ public class MappingUtils {
         }
 
         return "";
-    }
-
-    public static String getResourcePath(String[] uri) {
-        if (!uri[1].equals("resources")) {
-            uri[1] = "";
-        }
-        for (int i = 2; i < uri.length - 1; i++) {
-            uri[i] += "/";
-        }
-        return String.join("", uri);
-    }
-
-    public static void setImage(String path, OutputStream os, InputStream is) throws IOException {
-        try (InputStream inputStream = is) {
-            byte[] bytes = new byte[4096];
-            int b;
-            while ((b = inputStream.read(bytes)) != -1) {
-                os.write(bytes, 0, b);
-            }
-        }
     }
 }
 

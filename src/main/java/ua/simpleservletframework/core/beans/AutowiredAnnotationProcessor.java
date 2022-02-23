@@ -1,11 +1,10 @@
-package ua.simpleservletframework.core.annotation.processor.component;
+package ua.simpleservletframework.core.beans;
 
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
-import ua.simpleservletframework.core.annotation.annotation.component.Autowired;
-import ua.simpleservletframework.core.annotation.annotation.component.Component;
-import ua.simpleservletframework.core.annotation.annotation.component.Service;
-import ua.simpleservletframework.core.beans.BeanImplementation;
+import ua.simpleservletframework.core.annotation.Autowired;
+import ua.simpleservletframework.core.annotation.Component;
+import ua.simpleservletframework.core.annotation.Service;
 import ua.simpleservletframework.core.context.Context;
 import ua.simpleservletframework.mvc.annotation.annotation.controller.Controller;
 import ua.simpleservletframework.mvc.annotation.annotation.controller.RestController;
