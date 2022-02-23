@@ -3,6 +3,7 @@ package ua.simpleservletframework.mvc.annotation.processor.mapping;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.SneakyThrows;
 import ua.simpleservletframework.core.context.Context;
 import ua.simpleservletframework.mvc.annotation.annotation.controller.Controller;
 import ua.simpleservletframework.mvc.annotation.annotation.controller.RestController;
@@ -31,21 +32,27 @@ public class MappingAnnotationProcessor {
 
     private Set<Class<?>> getRequiredControllers(Set<Class<?>> controllers, HttpServletRequest request) {
         String requestUri = request.getRequestURI();
+
+        if (requestUri.length() > 1 && requestUri.endsWith("/")) {
+            requestUri = requestUri.substring(0, requestUri.length() - 1);
+        }
+
+        String finalRequestUri = requestUri;
         return controllers.stream()
                 .filter(c -> {
                     if (c.isAnnotationPresent(Controller.class)) {
-                        if (requestUri.startsWith(c.getAnnotation(Controller.class).value())) {
+                        if (finalRequestUri.startsWith(c.getAnnotation(Controller.class).value())) {
                             return MappingUtils.getRequiredControllers(
-                                    c, requestUri,
+                                    c, finalRequestUri,
                                     c.getAnnotation(Controller.class).value()
                             );
                         } else {
                             return false;
                         }
                     } else if (c.isAnnotationPresent(RestController.class)) {
-                        if (requestUri.startsWith(c.getAnnotation(RestController.class).value())) {
+                        if (finalRequestUri.startsWith(c.getAnnotation(RestController.class).value())) {
                             return MappingUtils.getRequiredControllers(
-                                    c, requestUri,
+                                    c, finalRequestUri,
                                     c.getAnnotation(RestController.class).value()
                             );
                         } else {
@@ -60,14 +67,19 @@ public class MappingAnnotationProcessor {
 
     private Map.Entry<? extends Class<?>, Method> getRequiredMethod(Set<Class<?>> requiredControllers, HttpServletRequest request) {
         String requestUri = request.getRequestURI();
+
+        if (requestUri.length() > 1 && requestUri.endsWith("/")) {
+            requestUri = requestUri.substring(0, requestUri.length() - 1);
+        }
+        String finalRequestUri = requestUri;
         return requiredControllers.stream()
                 .map(c -> {
                     Method mapping = Arrays.stream(c.getDeclaredMethods())
                             .filter(m -> {
                                 if (c.isAnnotationPresent(Controller.class)) {
-                                    return MappingUtils.getRequiredMethod(m, requestUri, c.getAnnotation(Controller.class).value());
+                                    return MappingUtils.getRequiredMethod(m, finalRequestUri, c.getAnnotation(Controller.class).value());
                                 } else if (c.isAnnotationPresent(RestController.class)) {
-                                    return MappingUtils.getRequiredMethod(m, requestUri, c.getAnnotation(RestController.class).value());
+                                    return MappingUtils.getRequiredMethod(m, finalRequestUri, c.getAnnotation(RestController.class).value());
                                 } else {
                                     throw new RuntimeException(MULTIPLE_CONTROLLER_TYPE_EXCEPTION);
                                 }
@@ -80,8 +92,10 @@ public class MappingAnnotationProcessor {
                                     return m.isAnnotationPresent(PutMapping.class);
                                 } else if (request.getMethod().equals(DELETE)) {
                                     return m.isAnnotationPresent(DeleteMapping.class);
-                                } else {
+                                } else if (request.getMethod().equals(OPTIONS)) {
                                     return m.isAnnotationPresent(OptionsMapping.class);
+                                } else {
+                                    return m.isAnnotationPresent(PatchMapping.class);
                                 }
                             })
                             .findFirst()
@@ -113,7 +127,8 @@ public class MappingAnnotationProcessor {
         mappingUtils.mappingHandler(result, controller);
     }
 
-    public void mappingHandler(Set<Class<?>> controllers, HttpServletRequest request, HttpServletResponse response) throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, ServletException {
+    @SneakyThrows
+    public void mappingHandler(Set<Class<?>> controllers, HttpServletRequest request, HttpServletResponse response) {
         DispatcherServlet.request = request;
         DispatcherServlet.response = response;
 
@@ -130,6 +145,8 @@ public class MappingAnnotationProcessor {
                     mapping.isAnnotationPresent(PutMapping.class)
                             || mapping.isAnnotationPresent(PostMapping.class)
                             || mapping.isAnnotationPresent(DeleteMapping.class)
+                            || mapping.isAnnotationPresent(PatchMapping.class)
+                            || mapping.isAnnotationPresent(OptionsMapping.class)
             ) {
                 otherRequestTypesHandler(controller, mapping);
             }

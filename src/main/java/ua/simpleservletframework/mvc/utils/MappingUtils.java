@@ -2,16 +2,20 @@ package ua.simpleservletframework.mvc.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
+import lombok.SneakyThrows;
+import ua.simpleservletframework.core.annotation.RequestBody;
 import ua.simpleservletframework.core.context.Context;
 import ua.simpleservletframework.mvc.annotation.annotation.controller.Controller;
 import ua.simpleservletframework.mvc.annotation.annotation.controller.RestController;
 import ua.simpleservletframework.mvc.annotation.annotation.mapping.*;
+import ua.simpleservletframework.mvc.annotation.annotation.url.PathVariable;
 import ua.simpleservletframework.mvc.servlet.DispatcherServlet;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -77,6 +81,19 @@ public class MappingUtils {
         return pathVariables;
     }
 
+    @SneakyThrows
+    private static <T> T getRequestBody(Class<T> valueType) {
+        return new ObjectMapper().readValue(request.getInputStream(), valueType);
+    }
+
+    private static Class<?> getValueFromRequestBody(Method mapping) {
+        return Arrays.stream(mapping.getParameters())
+                .filter(parameter -> parameter.isAnnotationPresent(RequestBody.class))
+                .map(Parameter::getType)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Could not to find requested body"));
+    }
+
     public static Object getMappingMethodResult(
             Context<?> context,
             Class<?> controller,
@@ -90,13 +107,38 @@ public class MappingUtils {
             } else {
                 cUri = controller.getAnnotation(RestController.class).value();
             }
-            String[] pathVars = getPVValues(
-                    getUriFromMapping(mapping),
-                    cUri
-            )
-                    .values()
-                    .toArray(new String[0]);
-            result = mapping.invoke(context.getBean(controller).getValue(), pathVars);
+
+            if (Arrays.stream(mapping.getParameters())
+                    .anyMatch(parameter -> parameter.isAnnotationPresent(PathVariable.class)) &&
+                    Arrays.stream(mapping.getParameters())
+                            .noneMatch(parameter -> parameter.isAnnotationPresent(RequestBody.class))
+            ) {
+                String[] pathVars = getPVValues(
+                        getUriFromMapping(mapping),
+                        cUri
+                )
+                        .values()
+                        .toArray(new String[0]);
+                result = mapping.invoke(context.getBean(controller).getValue(), pathVars);
+            } else if (Arrays.stream(mapping.getParameters())
+                    .anyMatch(parameter -> parameter.isAnnotationPresent(RequestBody.class)) &&
+                    Arrays.stream(mapping.getParameters())
+                            .noneMatch(parameter -> parameter.isAnnotationPresent(PathVariable.class))
+            ) {
+                Class<?> value = getValueFromRequestBody(mapping);
+                Object requestBody = getRequestBody(value);
+                result = mapping.invoke(context.getBean(controller).getValue(), requestBody);
+            } else {
+                String[] pathVars = getPVValues(
+                        getUriFromMapping(mapping),
+                        cUri
+                )
+                        .values()
+                        .toArray(new String[0]);
+                Class<?> value = getValueFromRequestBody(mapping);
+                Object requestBody = getRequestBody(value);
+                result = mapping.invoke(context.getBean(controller).getValue(), pathVars, requestBody);
+            }
         } else {
             result = mapping.invoke(context.getBean(controller).getValue());
         }
@@ -145,18 +187,34 @@ public class MappingUtils {
 
     private static String getUriFromMapping(Method method) {
         if (request.getMethod().equals(RequestMethod.GET)) {
-            return method.getAnnotation(GetMapping.class).value();
+            if (method.isAnnotationPresent(GetMapping.class)) {
+                return method.getAnnotation(GetMapping.class).value();
+            }
         } else if (request.getMethod().equals(RequestMethod.POST)) {
-            return method.getAnnotation(PostMapping.class).value();
+            if (method.isAnnotationPresent(PostMapping.class)) {
+                return method.getAnnotation(PostMapping.class).value();
+            }
         } else if (request.getMethod().equals(RequestMethod.PUT)) {
-            return method.getAnnotation(PutMapping.class).value();
+            if (method.isAnnotationPresent(PutMapping.class)) {
+                return method.getAnnotation(PutMapping.class).value();
+            }
         } else if (request.getMethod().equals(RequestMethod.DELETE)) {
-            return method.getAnnotation(DeleteMapping.class).value();
+            if (method.isAnnotationPresent(DeleteMapping.class)) {
+                return method.getAnnotation(DeleteMapping.class).value();
+            }
         } else if (request.getMethod().equals(RequestMethod.OPTIONS)) {
-            return method.getAnnotation(OptionsMapping.class).value();
+            if (method.isAnnotationPresent(OptionsMapping.class)) {
+                return method.getAnnotation(OptionsMapping.class).value();
+            }
+        } else if (request.getMethod().equals(RequestMethod.PATCH)) {
+            if (method.isAnnotationPresent(PatchMapping.class)) {
+                return method.getAnnotation(PatchMapping.class).value();
+            }
         } else {
             throw new RuntimeException(UNKNOWN_REQUEST_TYPE);
         }
+
+        return "";
     }
 }
 
