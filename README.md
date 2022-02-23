@@ -20,15 +20,18 @@ This project is being developed by me for improve my knowledge in Reflection and
 7. Connection pool;
 8. Auto-creation tables in the database;
 9. @PathVariable annotation is used on the values of storage path variables.
+10. @RequestBody annotation is used to json serialize
 ## Modules
 ### Core
-#### - Annotations @Component and @Service
+#### - @Component and @Service annotations
     These annotations are used over classes for instantiate singletones (beans) after deployment. 
     There is no different between them. @Service annotation was created for convenience while writing code and uses over classes that doing business logic.
 #### - Context class
     This class created for getting beans
 #### - ContextListener
     In this class beans are initialized, after that dependencies are injected
+#### - @RequestBody annotation
+    This annotation is used to json serialize
 ### MVC
 #### - DispatcherServlet
     This servlet handling all of HTTP-requests and direct them to the required controllers
@@ -50,12 +53,14 @@ This project is being developed by me for improve my knowledge in Reflection and
 #### - DatabaseConnection interface, ConnectionFactory, ConnectionPool, DataSource classes
     They are used for getting connection with the database.
 ## Projects which will be written using this framework
-1. [Company API] (https://github.com/SergiyKosh/servlet-api)
+1. [Company API](https://github.com/SergiyKosh/servlet-api)
+
     This project demonstrates features of my framework.
 
-    Database: PostgreSQL; 
+    Database: PostgreSQL;
+    
     Framework: 
-    1. @RestController, @Service, @PathVariable, @Component, @ComponentDao, @Get,Put,Post,DeleteMapping and @Autowired annotations.
-    2. Connection pool.
+    - @RestController, @Service, @PathVariable, @Component, @ComponentDao, @Get,Put,Post,DeleteMapping and @Autowired annotations.
+    - Connection pool.
 
     It's a RESTful API that can do CRUD operations on JSON format. In addition to this API, a client will be created using this framework.
